@@ -92,13 +92,13 @@ class fuck:
         driver.find_element_by_xpath(ENTER_VIDEO_XPATH).click()
 
     def next(self):
-        cur_type = self.judge_type()
+        cur_type, cur_name = self.extract_type_and_name()
         hook = {
             'TEXT': self.next_text,
             'VIDEO': self.next_video
         }
         hook[cur_type]()
-
+        print('[SUCCESS] 完成： {}'.format(cur_name))
         time.sleep(2)
         self.refresh()
 
@@ -114,14 +114,15 @@ class fuck:
     def mute(self):
         driver.execute_script(MUTE_JS)
 
-    def judge_type(self):
+    def extract_type_and_name(self):
         cur_div = driver.find_element_by_xpath('//div[@aria-selected="true"]')
+        cur_name = cur_div.find_element_by_xpath('div//span').text
         try:
             cur_div.find_element_by_xpath('div//i[@class="anticon anticon-video-camera"]')
-            return 'VIDEO'
+            return ('VIDEO', cur_name)
         except:
             cur_div.find_element_by_xpath('div//i[@class="anticon anticon-file-text"]')
-            return 'TEXT'
+            return ('TEXT', cur_name)
 
     def refresh(self):
         driver.refresh()
