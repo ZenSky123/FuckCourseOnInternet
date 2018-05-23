@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
-
+from contextlib import contextmanager
 from fuck.config import load_config
 
 chrome_options = Options()
@@ -9,13 +9,21 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--log-level=3')
 
-driver = webdriver.Chrome(chrome_options=chrome_options)
-
 LOGIN_URL = "http://student.zjedu.moocollege.com/system/login?url=http%3A%2F%2Fstudent.zjedu.moocollege.com%2F"
 MUTE_JS = 'document.getElementsByTagName("video")[0].muted=true;'
 
 config = load_config()
 college_name = config['college_name']
+
+
+@contextmanager
+def fuck_manage():
+    global driver
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    try:
+        yield fuck()
+    finally:
+        driver.close()
 
 
 def exist(xpath):
@@ -38,13 +46,14 @@ def block_until_valid(xpath, validation):
 
 class fuck:
     def __init__(self):
-        username = config['username']
-        password = config['password']
+        self.username = config['username']
+        self.password = config['password']
 
-        self.login(username, password)
+    def start(self):
+        self.login(self.username, self.password)
         block_until_appear('//*[@id="app"]/div/div/div/div[1]/div[1]/div[1]/ul/li[2]')
         time.sleep(2)
-        print('账号 「{}」 登陆成功'.format(username))
+        print('账号 「{}」 登陆成功'.format(self.username))
         driver.get('http://student.zjedu.moocollege.com/course/study/30002920')  # 暂时只支持马原
         self.enter_video()
         block_until_appear('//div[@aria-selected="true"]')
@@ -135,4 +144,5 @@ class fuck:
 
 
 if __name__ == '__main__':
-    fuck()
+    with fuck_manage() as f:
+        f.start()
