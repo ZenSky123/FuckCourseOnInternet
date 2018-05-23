@@ -44,6 +44,7 @@ class fuck:
         self.login(username, password)
         block_until_appear('//*[@id="app"]/div/div/div/div[1]/div[1]/div[1]/ul/li[2]')
         time.sleep(2)
+        print('账号 「{}」 登陆成功'.format(username))
         driver.get('http://student.zjedu.moocollege.com/course/study/30002920')  # 暂时只支持马原
         self.enter_video()
         block_until_appear('//div[@aria-selected="true"]')
@@ -94,12 +95,16 @@ class fuck:
 
     def next(self):
         cur_type, cur_name = self.extract_type_and_name()
+        if cur_type == 'TEXT':
+            print('进入文字类课程 「{}」'.format(cur_name))
+        else:
+            print('进入视频类课程 「{}」'.format(cur_name))
         hook = {
             'TEXT': self.next_text,
             'VIDEO': self.next_video
         }
         hook[cur_type]()
-        print('[SUCCESS] 完成： {}'.format(cur_name))
+        print('完成课程 {}'.format(cur_name))
         time.sleep(2)
         self.refresh()
 
