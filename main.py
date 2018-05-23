@@ -1,8 +1,15 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import time
+
 from fuck.config import load_config
 
-driver = webdriver.Chrome()
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
+
+driver = webdriver.Chrome(chrome_options=chrome_options)
+
 LOGIN_URL = "http://student.zjedu.moocollege.com/system/login?url=http%3A%2F%2Fstudent.zjedu.moocollege.com%2F"
 MUTE_JS = 'document.getElementsByTagName("video")[0].muted=true;'
 
