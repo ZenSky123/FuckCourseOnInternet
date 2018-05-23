@@ -1,5 +1,6 @@
 import os
 import json
+import codecs
 
 
 def mkdir(path):
@@ -25,9 +26,12 @@ def init_config(config_json):
     config_dirname = os.path.dirname(config_path)
     mkdir(config_dirname)
 
-    json.dump(config_json, open(config_path, 'w'))
+    json.dump(
+        config_json,
+        codecs.open(config_path, 'w', 'utf-8'),
+        ensure_ascii=False)
 
 
 def load_config():
     config_path = get_config_path()
-    return json.load(open(config_path))
+    return json.load(codecs.open(config_path, 'r', 'utf-8'))

@@ -6,6 +6,9 @@ driver = webdriver.Chrome()
 LOGIN_URL = "http://student.zjedu.moocollege.com/system/login?url=http%3A%2F%2Fstudent.zjedu.moocollege.com%2F"
 MUTE_JS = 'document.getElementsByTagName("video")[0].muted=true;'
 
+config = load_config()
+college_name = config['college_name']
+
 
 def exist(xpath):
     try:
@@ -27,16 +30,13 @@ def block_until_valid(xpath, validation):
 
 class fuck:
     def __init__(self):
-        config = load_config()
-
         username = config['username']
         password = config['password']
 
         self.login(username, password)
-        # self.enter_course()
         block_until_appear('//*[@id="app"]/div/div/div/div[1]/div[1]/div[1]/ul/li[2]')
         time.sleep(2)
-        driver.get('http://student.zjedu.moocollege.com/course/study/30002920')
+        driver.get('http://student.zjedu.moocollege.com/course/study/30002920')  # 暂时只支持马原
         self.enter_video()
         block_until_appear('//div[@aria-selected="true"]')
         while 1:
@@ -50,10 +50,10 @@ class fuck:
             '//*[@id="app"]/div/div/div/div[1]/div[2]/div/div/div[1]/ul/li[2]').click()  # 点击 学号登录
 
         college_input = driver.find_element_by_xpath('//*[@id="orgId"]')  # 找到院校框
-        college_input.send_keys('杭州师范大学')  # 填进信息
+        college_input.send_keys(college_name)  # 填进信息
 
         block_until_appear('/html/body/div[2]/div/div/div/ul/li')
-        block_until_valid('/html/body/div[2]/div/div/div/ul/li', '杭州师范大学')
+        block_until_valid('/html/body/div[2]/div/div/div/ul/li', college_name)
         driver.find_element_by_xpath('/html/body/div[2]/div/div/div/ul/li').click()  # 选择第一个
         # 如果院校名称第一个匹配不到那么说明配置有问题
 
@@ -61,16 +61,16 @@ class fuck:
         driver.find_element_by_xpath('//input[@id="passWord"]').send_keys(password)
         driver.find_element_by_xpath('//button[@type="submit"]').click()  # 点击登录
 
-    def find(self, course):
-        driver.find_element_by_xpath('//input[@placeholder="搜索课程"]').send_keys(course)
-        driver.find_element_by_xpath('//div[@class="course-home"]//button').click()  # 点击搜索
-        # 在class为course-home的div下第一个button就是搜索按钮
-        # 结果应该只有一个元素 --> 配置里面要写全部的名称
+    # def find(self, course):
+    #     driver.find_element_by_xpath('//input[@placeholder="搜索课程"]').send_keys(course)
+    #     driver.find_element_by_xpath('//div[@class="course-home"]//button').click()  # 点击搜索
+    #     # 在class为course-home的div下第一个button就是搜索按钮
+    #     # 结果应该只有一个元素 --> 配置里面要写全部的名称
 
-    def enter_course(self):
-        ENTER_COURSE_XPATH = '//div[@class="course-home"]//button'
-        block_until_appear(ENTER_COURSE_XPATH)
-        driver.find_elements_by_xpath(ENTER_COURSE_XPATH)[-1].click()
+    # def enter_course(self):
+    #     ENTER_COURSE_XPATH = '//div[@class="course-home"]//button'
+    #     block_until_appear(ENTER_COURSE_XPATH)
+    #     driver.find_elements_by_xpath(ENTER_COURSE_XPATH)[-1].click()
 
     def enter_video(self):
         PROCESS_XPATH = '//a[text()="学习进度"]'
